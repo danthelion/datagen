@@ -56,6 +56,9 @@ SSL_KEY_LOCATION=
 SCHEMA_REGISTRY_URL=
 SCHEMA_REGISTRY_USERNAME=
 SCHEMA_REGISTRY_PASSWORD=
+
+# OpenAI API key to infer schemas from sample records
+OPENAI_API_KEY=
 ```
 
 The `datagen` program will read the environment variables from `.env` in the current working directory.
@@ -75,6 +78,7 @@ Fake Data Generator
 Options:
   -V, --version             output the version number
   -s, --schema <char>       Schema file to use
+  -e, --example <char>      Example file to use
   -f, --format <char>       The format of the produced data (choices: "json", "avro", default: "json")
   -n, --number <char>       Number of records to generate. For infinite records, use -1 (default: "10")
   -c, --clean               Clean (delete) Kafka topics and schema subjects previously created
@@ -135,6 +139,12 @@ See example input schema files in [examples](./examples) and [tests](/tests) fol
         --schema tests/products.sql \
         --format avro \
         --clean
+    ```
+   
+1. Use an example JSON to generate data
+    ```bash
+    datagen \
+        --example tests/example_record.json
     ```
 
 ### Generate records with sequence numbers
@@ -266,4 +276,17 @@ Here is an example Avro input schema from `tests/schema.avsc` that will produce 
     { "name": "ownerIds", "type": { "type": "array", "items": "string" } }
   ]
 }
+```
+
+## Example input
+
+You can provide a sample JSON file as input without a schema. The `--example` flag acceps a file path to a JSON file.
+The file should contain a single JSON object. A Faker schema will be generated based on the sample using GPT-3. Requires
+an API key for GPT-3 set as an environment variable `OPENAI_API_KEY`.
+
+Example:
+
+```
+datagen \
+    --example tests/example_record.json
 ```

@@ -1,10 +1,13 @@
 import fs from "fs";
 import {OpenAI} from "langchain/llms/openai";
 import {PromptTemplate} from "langchain";
+import path from "path";
 
 export async function generateFakerRecordFromExampleRecord(exampleRecord: any) {
+    // Find path to prompt file in parent folder
+    const promptPath = path.resolve() + '/src/utils/examplerecord_parser_prompt.txt';
     const promptText = await fs.promises.readFile(
-        'prompt.txt',
+        promptPath,
         'utf8'
     );
     const model = new OpenAI({ temperature: 0.0 , maxTokens: -1});
