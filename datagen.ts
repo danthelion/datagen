@@ -14,13 +14,15 @@ import { parseAvroSchema } from './src/schemas/parseAvroSchema.js';
 import parseJsonSchema from './src/schemas/parseJsonSchema.js';
 import cleanKafka from './src/kafka/cleanKafka.js';
 import dataGenerator from './src/dataGenerator.js';
+import { generateFakerRecordFromExampleRecord } from './src/schemas/parseExampleRecord.js';
 import fs from 'fs';
 import { program, Option } from 'commander';
 
 program.name('datagen').description('Fake Data Generator').version('0.2.1');
 
 program
-    .requiredOption('-s, --schema <char>', 'Schema file to use')
+    .option('-e, --example <char>', 'Example to use')
+    .option('-s, --schema <char>', 'Schema file to use')
     .addOption(
         new Option('-f, --format <char>', 'The format of the produced data')
             .choices(['json', 'avro'])
@@ -43,7 +45,7 @@ program.parse();
 
 const options = program.opts();
 
-if (!fs.existsSync(options.schema)) {
+if (options.schema && !fs.existsSync(options.schema)) {
     alert({
         type: `error`,
         name: `Schema file ${options.schema} does not exist!`,
@@ -72,36 +74,41 @@ if (!global.wait) {
     let schemaFile;
 
     // Parse the schema file
-    try {
-        // Read the schema file extension
-        const schemaFormat = options.schema.split('.').pop();
-        switch (schemaFormat) {
-            case 'avsc':
-                schemaFile = fs.readFileSync(options.schema, 'utf8');
-                parsedSchema = await parseAvroSchema(schemaFile);
-                break;
-            case 'json':
-                schemaFile = fs.readFileSync(options.schema, 'utf8');
-                parsedSchema = await parseJsonSchema(schemaFile);
-                break;
-            case 'sql':
-                parsedSchema = await parseSqlSchema(options.schema);
-                break;
-            default:
-                alert({
-                    type: `error`,
-                    name: `Schema file ${options.schema} is not supported!`,
-                    msg: `Supported formats are: .avsc, .json, .sql`
-                });
-                break;
+    if (options.example) {
+        const parsedExample = JSON.parse(fs.readFileSync(options.example, 'utf8'));
+        parsedSchema = await generateFakerRecordFromExampleRecord(JSON.stringify(parsedExample));
+    } else {
+        try {
+            // Read the schema file extension
+            const schemaFormat = options.schema.split('.').pop();
+            switch (schemaFormat) {
+                case 'avsc':
+                    schemaFile = fs.readFileSync(options.schema, 'utf8');
+                    parsedSchema = await parseAvroSchema(schemaFile);
+                    break;
+                case 'json':
+                    schemaFile = fs.readFileSync(options.schema, 'utf8');
+                    parsedSchema = await parseJsonSchema(schemaFile);
+                    break;
+                case 'sql':
+                    parsedSchema = await parseSqlSchema(options.schema);
+                    break;
+                default:
+                    alert({
+                        type: `error`,
+                        name: `Schema file ${options.schema} is not supported!`,
+                        msg: `Supported formats are: .avsc, .json, .sql`
+                    });
+                    break;
+            }
+        } catch (error) {
+            alert({
+                type: `error`,
+                name: `Could not parse schema`,
+                msg: `\n  ${error.message}`
+            });
+            process.exit(1);
         }
-    } catch (error) {
-        alert({
-            type: `error`,
-            name: `Could not parse schema`,
-            msg: `\n  ${error.message}`
-        });
-        process.exit(1);
     }
 
     if (global.clean) {

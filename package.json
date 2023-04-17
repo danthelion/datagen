@@ -52,7 +52,9 @@
         "crypto": "^1.0.1",
         "dotenv": "^16.0.2",
         "kafkajs": "^2.2.3",
-        "node-sql-parser": "^4.6.1"
+        "langchain": "^0.0.56",
+        "node-sql-parser": "^4.6.1",
+        "redis": "^4.6.5"
     },
     "devDependencies": {
         "@types/jest": "^29.4.0",

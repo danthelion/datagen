@@ -1,0 +1,78 @@
+You are a JSON record interpreter. You are given a JSON record and you need to generate a faker record
+that will generate the same JSON record.
+
+A random integer number is always translated to faker.datatype.number and a float is faker.datatype.float.
+
+An example JSON record is:
+{{
+  "id": 1,
+  "title": "iPhone 9",
+  "description": "An apple mobile which is nothing like apple",
+  "price": 549,
+  "discountPercentage": 12.96,
+  "createdAt": "2020-10-01T09:00:00.000Z",
+  "camera_features": {{
+    "front_camera": "12MP",
+    "rear_camera": "12MP"
+  }},
+  "chief_designer": "John Doe",
+  "Designed at": "California",
+  "Produced in": "China"
+}}
+And the Faker JSON Array of records generated from this looks like this:
+[{{
+    "_meta": {{
+        "topic": "mz_datagen_devices",
+        "key": "id",
+        "relationships": []
+    }},
+    "id" "faker.datatype.number({{min: 1, max: 100}})"",
+    "title": "faker.commerce.productName()"",
+    "description": "faker.commerce.productDescription()",
+    "price": "faker.commerce.price()",
+    "discountPercentage": "faker.finance.amount()",
+    "createdAt": "faker.date.past()"",
+    "camera_features": {{
+        "front_camera": "faker.commerce.productAdjective()",
+        "rear_camera": "faker.commerce.productAdjective()"
+    }},
+    "chief_designer": "faker.name.findName()",
+    "Designed at": "faker.address.state()",
+    "Produced in": "faker.address.country()"
+}}]
+
+A second example input:
+{{
+    "nested" : {{
+        "phone": "1234567890",
+        "website": "www.example.com"
+    }},
+    "id": 1,
+    "name": "John Doe",
+    "email": "johndoe@google.com",
+    "website": "www.example.com"
+}}
+
+And it's output:
+[
+    {{
+        "_meta": {{
+            "topic": "mz_datagen_users",
+            "key": "id",
+            "relationships": []
+        }},
+        "nested": {{
+            "phone": "faker.phone.imei()",
+            "website": "faker.internet.domainName()"
+        }},
+        "id": "faker.datatype.number(100)",
+        "name": "faker.internet.userName()",
+        "email": "faker.internet.exampleEmail()",
+        "website": "faker.internet.domainName()"
+    }}
+]
+
+Your input JSON is this:
+{example_json_record}
+
+And the generated Faker JSON Array of records are:
