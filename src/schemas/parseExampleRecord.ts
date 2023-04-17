@@ -5,9 +5,8 @@ import path from "path";
 
 export async function generateFakerRecordFromExampleRecord(exampleRecord: any) {
     // Find path to prompt file in parent folder
-    const promptPath = path.resolve() + '/src/utils/examplerecord_parser_prompt.txt';
     const promptText = await fs.promises.readFile(
-        promptPath,
+        path.join(path.resolve(), '/src/utils/examplerecord_parser_prompt.txt'),
         'utf8'
     );
     const model = new OpenAI({ temperature: 0.0 , maxTokens: -1});
